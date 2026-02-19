@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template_string
 import random
+import os
 
 app = Flask(__name__)
 
@@ -37,7 +38,6 @@ HTML_TEMPLATE = """
             overflow: hidden;
         }
 
-        /* Time Selection */
         #settings {
             display: flex;
             gap: 20px;
@@ -75,7 +75,6 @@ HTML_TEMPLATE = """
         .correct { color: var(--text); }
         .incorrect { color: var(--err); }
 
-        /* The Animated Cursor */
         #cursor {
             position: absolute;
             width: 2px;
@@ -169,7 +168,6 @@ async function init() {
         wordsContent.appendChild(wordDiv);
     });
 
-    // Reset Cursor Position
     setTimeout(moveCursor, 0); 
     document.getElementById("word-wrapper").focus();
 }
@@ -184,7 +182,6 @@ function updateTime(s, el) {
 function moveCursor() {
     const target = letters[cursorIdx];
     if (target) {
-        // We use transform instead of left/top for 60fps smoothness
         cursor.style.transform = `translate(${target.offsetLeft}px, ${target.offsetTop}px)`;
     }
 }
@@ -193,7 +190,6 @@ window.addEventListener("keydown", e => {
     if (e.key === "Escape") init();
     if (timeLeft <= 0) return;
 
-    // Start Timer
     if (!active && e.key.length === 1) {
         active = true;
         timer = setInterval(() => {
@@ -211,17 +207,14 @@ window.addEventListener("keydown", e => {
         }
     } else if (e.key.length === 1) {
         const expected = letters[cursorIdx].innerText.replace(/\\u00a0/g, " ");
-        
         if (e.key === expected) {
             letters[cursorIdx].classList.add("correct");
         } else {
             letters[cursorIdx].classList.add("incorrect");
             errors++;
         }
-        
         totalTyped++;
         cursorIdx++;
-        
         if (cursorIdx >= letters.length) finish();
         else moveCursor();
     }
@@ -251,22 +244,8 @@ def index():
 
 @app.route("/get-words")
 def get_words():
-    # Large word set to avoid running out
     return jsonify(random.sample(word_bank * 5, 60))
-
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
-
-
-
-   
-
-
-
