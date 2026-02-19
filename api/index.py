@@ -254,11 +254,14 @@ def get_words():
     # Large word set to avoid running out
     return jsonify(random.sample(word_bank * 5, 60))
 
-app = app
+if __name__ == "__main__":
+    app.run()
+
 
 
 
 
 
    
+
 
